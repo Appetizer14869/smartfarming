@@ -1,0 +1,46 @@
+# Environment files
+.env
+.env.*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build / runtime artifacts
+dist/
+build/
+coverage/
+*.pid
+*.seed
+*.pid.lock
+
+# Database files
+*.sqlite3
+*.db
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+*.tmp
+*.temp

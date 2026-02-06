@@ -1,0 +1,17 @@
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+joblib
+Flask
+flask-cors
+requests
+gunicorn
+python-dotenv
+pymongo
+bcrypt
+PyJWT
+email-validator
+pytest
+flask-jwt-extended
