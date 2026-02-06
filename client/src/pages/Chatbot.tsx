@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { X, Send, Bot, User, Sparkles, MessageCircle } from 'lucide-react';
 import { sendChatMessage } from '../lib/api';
 import type { AxiosError } from 'axios';
-import ReactMarkdown from 'react-markdown'
 
 interface Message {
   id: string;
@@ -61,11 +61,11 @@ const Chatbot: React.FC = () => {
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       const axiosError = error as AxiosError<{ error?: string; message?: string }>;
-      const errorText = 
-        axiosError.response?.data?.error || 
-        axiosError.response?.data?.message || 
+      const errorText =
+        axiosError.response?.data?.error ||
+        axiosError.response?.data?.message ||
         'Sorry, there was an error connecting to the AI assistant.';
-      
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: errorText,
@@ -135,9 +135,25 @@ const Chatbot: React.FC = () => {
                     </div>
                     <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-md shadow-md border border-gray-100">
                       <p className="text-gray-800 text-sm leading-relaxed">
-                        <ReactMarkdown>
-
-                        {message.text}
+                        <ReactMarkdown
+                          components={{
+                            p: ({ children }) => (
+                              <p className="text-sm leading-relaxed my-2">{children}</p>
+                            ),
+                            h1: ({ children }) => (
+                              <h1 className="text-lg font-bold text-emerald-600">{children}</h1>
+                            ),
+                            h2: ({ children }) => (
+                              <h2 className="text-md font-semibold text-emerald-500">{children}</h2>
+                            ),
+                            ul: ({ children }) => <ul className="list-disc pl-5">{children}</ul>,
+                            li: ({ children }) => <li className="text-sm">{children}</li>,
+                            strong: ({ children }) => (
+                              <strong className="font-bold text-emerald-700">{children}</strong>
+                            ),
+                          }}
+                        >
+                          {message.text}
                         </ReactMarkdown>
                       </p>
                       <span className="text-[10px] text-gray-400 mt-1 block">
@@ -150,11 +166,8 @@ const Chatbot: React.FC = () => {
                   <div className="flex items-start gap-3 max-w-[85%]">
                     <div className="bg-gradient-to-br from-emerald-500 to-green-600 px-4 py-3 rounded-2xl rounded-tr-md shadow-md">
                       <p className="text-white text-sm leading-relaxed">
-                        <ReactMarkdown>
-
-                        {message.text}
-                        </ReactMarkdown>
-                        </p>
+                        <ReactMarkdown>{message.text}</ReactMarkdown>
+                      </p>
                       <span className="text-[10px] text-emerald-100 mt-1 block text-right">
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>

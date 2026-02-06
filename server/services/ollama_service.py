@@ -9,12 +9,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 load_dotenv()
 
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b") 
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
-class OllamaService: 
-    def __init__(self, api_url=None, model=None): 
-        self.api_url = api_url or OLLAMA_API_URL 
-        self.model = model or OLLAMA_MODEL 
+class OllamaService:
+    def __init__(self, api_url=None, model=None):
+        self.api_url = api_url or OLLAMA_API_URL
+        self.model = model or OLLAMA_MODEL
         self.enabled = False  # will be set after check_status()
 
         # Load fallback chatbot data
@@ -63,9 +63,9 @@ Be concise but thorough. If you don't know something, say so honestly. Always be
                     "system": system_instruction,
                     "stream": False,
                     "options": {
-                        "temperature": 0.7, 
-                        "top_p": 0.9, 
-                        "top_k": 40, 
+                        "temperature": 0.7,
+                        "top_p": 0.9,
+                        "top_k": 40,
                         "num_predict": 800
                     },
                 }
@@ -80,7 +80,7 @@ Be concise but thorough. If you don't know something, say so honestly. Always be
 
     def _fallback(self, user_prompt):
         """Use TF-IDF similarity to return a fallback answer."""
-        if not self.vectorizer or not self.tfidf_matrix.any():
+        if not self.vectorizer or self.tfidf_matrix.nnz == 0:
             return "⚠️ No fallback data available."
         try:
             user_vec = self.vectorizer.transform([user_prompt])

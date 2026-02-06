@@ -11,7 +11,7 @@ from routes.recommendation_history_routes import bp_recommend_history
 from routes.auth_routes import auth_bp
 from routes.user_routes import user_bp
 from routes.chat_routes import bp_chat
-from models.user_model import ensure_user_indexes
+from Schema.user_schema import ensure_user_indexes
 from services.ollama_service import OllamaService
 
 
