@@ -73,6 +73,52 @@ python -m venv .venv # this creates a virtual environment where the app runs on.
 .venv/Scripts/Activate.ps1  #activate the virtual environment.
 
 
+### create a .env file for your backend.
+# ===============================
+# Backend (Flask)
+# ===============================
+
+#port number
+PORT=
+
+# MongoDB connection string
+# Local MongoDB
+MONGO_URI=mongodb://localhost:27017/Crop_recommendation_db
+
+# JWT configuration
+# run this command python -c "import secrets; print(secrets.token_hex(32))" 
+JWT_SECRET=your secret key
+
+# JWT signing algorithm
+JWT_ALGORITHM=HS256
+
+# Token expiration time (minutes)
+JWT_EXPIRES_MINUTES=60
+
+
+# CORS (React dev server)
+# Comma-separated if you have multiple origins
+CORS_ORIGINS=http://localhost:5173
+
+
+# Flask environment (optional but recommended)
+FLASK_ENV=development
+FLASK_DEBUG=1
+
+OPENWEATHER_API_KEY=your key
+OLLAMA_API_URL=http://localhost:11434
+
+# Check Ollama availability
+OLLAMA_ENABLED = False
+OLLAMA_MODEL = "llama3.2:3b"  # Fast, efficient model for general use
+
+
+
+### front end .env
+VITE_API_BASE=http://127.0.0.1:5000
+
+
+
 
 ```bash
 # Navigate to server folder
