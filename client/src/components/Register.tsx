@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus, Mail, Lock, CheckCircle2, Leaf, Sparkles } from 'lucide-react';
+import { UserPlus, Mail, Lock, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -12,6 +12,8 @@ export default function Register() {
   const [success, setSuccess] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -60,25 +62,6 @@ export default function Register() {
       </div>
 
       <div className="max-w-md w-full relative z-10">
-        {/* Logo and branding */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl blur-lg opacity-50"></div>
-              <div className="relative bg-gradient-to-br from-emerald-500 to-green-600 p-4 rounded-2xl shadow-lg">
-                <Leaf className="w-10 h-10 text-white" />
-              </div>
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-green-700 bg-clip-text text-transparent mb-2">
-            AgriPredict
-          </h1>
-          <p className="text-gray-600 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-500" />
-            Smart Farming Solutions
-          </p>
-        </div>
-
         {/* Register card */}
         <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
           <div className="text-center mb-6">
@@ -137,25 +120,35 @@ export default function Register() {
                 Password
               </label>
               <div className="relative">
+                {/* Left Lock Icon */}
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
+
+                {/* Password Input */}
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
-                  placeholder="Min. 8 characters"
+                  className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+                  placeholder="Enter your password"
                   disabled={loading}
                 />
+
+                {/* Right Eye Icon */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-600 transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
-              <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                Use at least 8 characters
-              </p>
             </div>
 
             <div>
@@ -163,18 +156,34 @@ export default function Register() {
                 Confirm Password
               </label>
               <div className="relative">
+                {/* Left Lock Icon */}
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
+
+                {/* Password Input */}
                 <input
                   id="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
-                  placeholder="Re-enter password"
+                  className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+                  placeholder="Confirm your password"
                   disabled={loading}
                 />
+
+                {/* Right Eye Icon */}
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-600 transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -200,8 +209,8 @@ export default function Register() {
           <div className="mt-6 text-center">
             <p className="text-gray-600 text-sm">
               Already have an account?{' '}
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors inline-flex items-center gap-1"
               >
                 Sign in
@@ -215,7 +224,7 @@ export default function Register() {
 
         {/* Footer text */}
         <p className="text-center text-gray-500 text-xs mt-6">
-          © 2026 AgriPredict. Empowering farmers with AI-driven insights.
+          © {new Date().getFullYear()} AgriPredict. Empowering farmers with AI-driven insights.
         </p>
       </div>
     </div>

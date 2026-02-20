@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 from pymongo.errors import DuplicateKeyError
 from utils.validators import validate_registration, validate_login
 from services.auth_service import hash_password, verify_password, create_jwt
+from datetime import datetime, timezone
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -18,6 +19,9 @@ def register():
         "username": data["username"],
         "email": data["email"],
         "passwordHash": hash_password(data["password"]),
+        "role": "user",
+        "createdAt": datetime.now(timezone.utc),
+        "updatedAt": datetime.now(timezone.utc),
     }
 
     try:
@@ -43,7 +47,7 @@ def login():
         return jsonify({"message": "Invalid email or password"}), 401
 
     token = create_jwt(
-        payload={"sub": str(user["_id"]), "email": user["email"], "username": user["username"]},
+        payload={"sub": str(user["_id"]), "email": user["email"], "username": user["username"], "role": user.get("role", "user")},
         secret=current_app.config["JWT_SECRET"],
         algorithm=current_app.config["JWT_ALGORITHM"],
         expires_minutes=current_app.config["JWT_EXPIRES_MINUTES"],
@@ -53,7 +57,7 @@ def login():
     return jsonify({
         "message": "Login successful",
         "token": token,
-        "user": {"username": user["username"], "email": user["email"]}
+        "user": {"username": user["username"], "email": user["email"], "role": user.get("role", "user")},
     }), 200
 
 

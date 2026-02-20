@@ -21,9 +21,4 @@ class Config:
     FLASK_ENV = os.getenv("FLASK_ENV", "development")
     FLASK_DEBUG = os.getenv("FLASK_DEBUG", "0") == "1"
     API_KEY = os.getenv("OPENWEATHER_API_KEY")
-    OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
-
-    # Check Ollama availability
-    OLLAMA_ENABLED = False
-    OLLAMA_MODEL = "llama3.2:3b"  # Fast, efficient model for general use
 

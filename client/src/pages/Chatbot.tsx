@@ -1,28 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { X, Send, Bot, User, Sparkles, MessageCircle } from 'lucide-react';
-import { sendChatMessage } from '../lib/api';
+import { X, Bot, User, Sparkles, MessageCircle, ChevronRight } from 'lucide-react';
+import { askChatbot } from '../lib/api';
 import type { AxiosError } from 'axios';
+import '../index.css';
 
 interface Message {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+  buttons?: ButtonOption[];
+}
+
+interface ButtonOption {
+  label: string;
+  action: 'navigate' | 'help';
 }
 
 const Chatbot: React.FC = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm your AgriPredict AI assistant. How can I help you with your farming today?",
+      text: "Hello! I'm your AgriPredict AI assistant. Ask me about any crop name and get insights?",
       sender: 'bot',
       timestamp: new Date(),
     },
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [, setCurrentCrop] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -33,32 +43,66 @@ const Chatbot: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+  const handleButtonClick = (button: ButtonOption) => {
+    if (button.action === 'navigate') {
+      // Navigate to farm guide page
+      navigate("/dashboard/farm-guide");
+      setIsOpen(false); // Close chatbot when navigating
+    } else if (button.action === 'help') {
+      // Add user's button click as a message
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        text: button.label,
+        sender: 'user',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, userMessage]);
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    const currentInput = inputValue;
-    setInputValue('');
-    setIsLoading(true);
-
-    try {
-      const data = await sendChatMessage(currentInput);
-
-      const botMessage: Message = {
+      // Show help message
+      const helpMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.response || 'Sorry, I could not process your request.',
+        text: "If you need assistance or have any questions, feel free to reach out to our support team at supporteam@gmail.com, or check out our detailed user guide for more information.",
         sender: 'bot',
         timestamp: new Date(),
       };
+      setMessages((prev) => [...prev, helpMessage]);
+    }
+  };
 
-      setMessages((prev) => [...prev, botMessage]);
+  const fetchCropIntroduction = async (cropName: string) => {
+    setIsLoading(true);
+    setCurrentCrop(cropName);
+
+    try {
+      const data = await askChatbot(cropName);
+
+      if (data.success) {
+        // Format the introduction with crop name
+        const cropDisplayName = cropName.charAt(0).toUpperCase() + cropName.slice(1);
+        const introText = `**What is ${cropDisplayName}?**\n\n${data.introduction}`;
+
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: introText,
+          sender: 'bot',
+          timestamp: new Date(),
+          buttons: [
+            { label: 'Would you like to know more?', action: 'navigate' },
+            { label: 'Help', action: 'help' }
+          ]
+        };
+
+        setMessages((prev) => [...prev, botMessage]);
+      } else {
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: `Sorry, I couldn't find information about "${cropName}". Please try another crop name or check our Farming Guide section.`,
+          sender: 'bot',
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+        setCurrentCrop(null);
+      }
     } catch (error) {
       const axiosError = error as AxiosError<{ error?: string; message?: string }>;
       const errorText =
@@ -73,9 +117,28 @@ const Chatbot: React.FC = () => {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
+      setCurrentCrop(null);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: inputValue,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputValue;
+    setInputValue('');
+
+    // Treat input as a crop query
+    await fetchCropIntroduction(currentInput);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -89,9 +152,9 @@ const Chatbot: React.FC = () => {
     <>
       {/* Floating Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-[420px] h-[580px] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col z-50 overflow-hidden border border-gray-200/50 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-24 right-6 w-[440px] h-[600px] bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col z-50 overflow-hidden border border-gray-200/50 animate-in slide-in-from-bottom-4 duration-300">
           {/* Header */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-4 rounded-t-3xl">
+          <div className="relative overflow-hidden bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-5 rounded-t-3xl">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -122,63 +185,81 @@ const Chatbot: React.FC = () => {
           {/* Messages Container */}
           <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/50 to-white space-y-4 custom-scrollbar">
             {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.sender === 'user' ? 'justify-end' : 'justify-start'
-                } animate-in slide-in-from-bottom-2 duration-300`}
-              >
-                {message.sender === 'bot' && (
-                  <div className="flex items-start gap-3 max-w-[85%]">
-                    <div className="flex-shrink-0 bg-gradient-to-br from-emerald-500 to-green-600 p-2 rounded-xl shadow-lg">
-                      <Bot className="w-4 h-4 text-white" />
+              <div key={message.id}>
+                <div
+                  className={`flex ${
+                    message.sender === 'user' ? 'justify-end' : 'justify-start'
+                  } animate-in slide-in-from-bottom-2 duration-300`}
+                >
+                  {message.sender === 'bot' && (
+                    <div className="flex items-start gap-3 max-w-[90%]">
+                      <div className="flex-shrink-0 bg-gradient-to-br from-emerald-500 to-green-600 p-2 rounded-xl shadow-lg">
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-md shadow-md border border-gray-100">
+                        <div className="text-gray-800 text-sm leading-relaxed prose prose-sm max-w-none">
+                          <ReactMarkdown
+                            components={{
+                              p: ({ children }) => (
+                                <p className="mb-2 last:mb-0">{children}</p>
+                              ),
+                              strong: ({ children }) => (
+                                <strong className="font-bold text-emerald-700">{children}</strong>
+                              ),
+                              ul: ({ children }) => (
+                                <ul className="list-disc pl-5 space-y-1 my-2">{children}</ul>
+                              ),
+                              li: ({ children }) => (
+                                <li className="text-sm text-gray-700">{children}</li>
+                              ),
+                            }}
+                          >
+                            {message.text}
+                          </ReactMarkdown>
+                        </div>
+                        <span className="text-[10px] text-gray-400 mt-1 block">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
                     </div>
-                    <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-md shadow-md border border-gray-100">
-                      <p className="text-gray-800 text-sm leading-relaxed">
-                        <ReactMarkdown
-                          components={{
-                            p: ({ children }) => (
-                              <p className="text-sm leading-relaxed my-2">{children}</p>
-                            ),
-                            h1: ({ children }) => (
-                              <h1 className="text-lg font-bold text-emerald-600">{children}</h1>
-                            ),
-                            h2: ({ children }) => (
-                              <h2 className="text-md font-semibold text-emerald-500">{children}</h2>
-                            ),
-                            ul: ({ children }) => <ul className="list-disc pl-5">{children}</ul>,
-                            li: ({ children }) => <li className="text-sm">{children}</li>,
-                            strong: ({ children }) => (
-                              <strong className="font-bold text-emerald-700">{children}</strong>
-                            ),
-                          }}
-                        >
+                  )}
+                  {message.sender === 'user' && (
+                    <div className="flex items-start gap-3 max-w-[90%]">
+                      <div className="bg-gradient-to-br from-emerald-500 to-green-600 px-4 py-3 rounded-2xl rounded-tr-md shadow-md">
+                        <p className="text-white text-sm leading-relaxed">
                           {message.text}
-                        </ReactMarkdown>
-                      </p>
-                      <span className="text-[10px] text-gray-400 mt-1 block">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                        </p>
+                        <span className="text-[10px] text-emerald-100 mt-1 block text-right">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <div className="flex-shrink-0 bg-gray-100 p-2 rounded-xl shadow-md">
+                        <User className="w-4 h-4 text-gray-700" />
+                      </div>
                     </div>
-                  </div>
-                )}
-                {message.sender === 'user' && (
-                  <div className="flex items-start gap-3 max-w-[85%]">
-                    <div className="bg-gradient-to-br from-emerald-500 to-green-600 px-4 py-3 rounded-2xl rounded-tr-md shadow-md">
-                      <p className="text-white text-sm leading-relaxed">
-                        <ReactMarkdown>{message.text}</ReactMarkdown>
-                      </p>
-                      <span className="text-[10px] text-emerald-100 mt-1 block text-right">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                    <div className="flex-shrink-0 bg-gray-100 p-2 rounded-xl shadow-md">
-                      <User className="w-4 h-4 text-gray-700" />
-                    </div>
+                  )}
+                </div>
+
+                {/* Interactive Buttons */}
+                {message.buttons && message.buttons.length > 0 && (
+                  <div className="ml-12 mt-3 flex flex-wrap gap-2">
+                    {message.buttons.map((button, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleButtonClick(button)}
+                        className="group bg-white hover:bg-gradient-to-r hover:from-emerald-500 hover:to-green-600 border-2 border-emerald-500 text-emerald-600 hover:text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2"
+                      >
+                        <span>{button.label}</span>
+                        {button.action === 'navigate' && (
+                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        )}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
             ))}
+
             {isLoading && (
               <div className="flex items-start gap-3 animate-in slide-in-from-bottom-2 duration-300">
                 <div className="flex-shrink-0 bg-gradient-to-br from-emerald-500 to-green-600 p-2 rounded-xl shadow-lg">
@@ -204,21 +285,21 @@ const Chatbot: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask anything about farming..."
-                className="flex-1 px-3 py-2 bg-transparent focus:outline-none text-sm placeholder-gray-400 text-gray-900"
+                placeholder="Please enter the crop name or type..."
+                className="flex-1 px-3 py-2.5 bg-transparent focus:outline-none text-sm placeholder-gray-400 text-gray-900"
                 disabled={isLoading}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isLoading}
-                className="bg-gradient-to-r from-emerald-500 to-green-600 text-white p-2.5 rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-4 py-2.5 rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-semibold text-sm"
                 aria-label="Send message"
               >
-                <Send className="w-4 h-4" />
+                Send
               </button>
             </div>
             <p className="text-[10px] text-gray-400 mt-2 text-center">
-              Powered by AgriPredict AI
+              Powered by AgriPredict AI © {new Date().getFullYear()}
             </p>
           </div>
         </div>
@@ -245,39 +326,6 @@ const Chatbot: React.FC = () => {
         )}
       </button>
 
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #d1d5db;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
-        }
-        
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-        
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </>
   );
 };

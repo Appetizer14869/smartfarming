@@ -14,6 +14,8 @@ import SavedAnalytics from "./pages/SavedAnalytics";
 import { AnalyticsProvider } from "./context/AnalyticsContext";
 import Settings from "./pages/Settings";
 import { NotificationProvider } from "./context/NotificationContext";
+import FarmGuide from "./pages/FarmGuide";
+import DiseaseDetection from "./pages/DiseaseDetection";
 
 
 
@@ -48,6 +50,8 @@ function App() {
             <Route path="analytics" element={<Analytics/>}/>
             <Route path="saved-analytics" element={<SavedAnalytics/>}/>
             <Route path="settings" element={<Settings/>}/>
+            <Route path="farm-guide" element={<FarmGuide />} />
+            <Route path="disease-detection" element={<DiseaseDetection />} />
             </Route>
         </Routes>
         <Toaster position="top-center"/>

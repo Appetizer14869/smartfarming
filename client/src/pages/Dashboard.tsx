@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { motion } from "framer-motion";
@@ -13,6 +13,7 @@ export default function Dashboard() {
   const closeSidebar = () => setIsSidebarOpen(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const isOverview = location.pathname === "/dashboard";
 
   return (
@@ -65,7 +66,7 @@ export default function Dashboard() {
                           <div className="flex items-center gap-2">
                             <Sprout className="w-5 h-5 text-emerald-100" />
                             <div>
-                              <p className="text-2xl font-bold">30+</p>
+                              <p className="text-2xl font-bold">20+</p>
                               <p className="text-xs text-emerald-100">Crop Types</p>
                             </div>
                           </div>
@@ -116,20 +117,23 @@ export default function Dashboard() {
                       desc: "Personalized crop recommendations based on soil and weather data using advanced ML algorithms.",
                       gradient: "from-emerald-500 to-green-600",
                       bgGradient: "from-emerald-50 to-green-50",
+                      onClick: () => navigate("/dashboard/recommend-manual")
                     },
                     {
                       icon: <ShieldCheck className="w-8 h-8" />,
-                      title: "Disease Prevention",
+                      title: "Disease Detection",
                       desc: "Early warning systems to protect your crops from threats and maximize plant health.",
                       gradient: "from-blue-500 to-cyan-600",
                       bgGradient: "from-blue-50 to-cyan-50",
+                      onClick: () => navigate("/dashboard/disease-detection")
                     },
                     {
                       icon: <Sprout className="w-8 h-8" />,
-                      title: "Yield Optimization",
-                      desc: "Maximize harvests with data-driven insights and real-time monitoring of environmental conditions.",
+                      title: "Crop Farming Guide",
+                      desc: "Get detailed farming information for your selected crop",
                       gradient: "from-green-500 to-teal-600",
                       bgGradient: "from-green-50 to-teal-50",
+                      onClick: () => navigate("/dashboard/farm-guide")
                     },
                   ].map((feature, idx) => (
                     <motion.div
@@ -147,7 +151,10 @@ export default function Dashboard() {
                         {feature.title}
                       </h3>
                       <p className="text-sm text-gray-600 mb-4 leading-relaxed">{feature.desc}</p>
-                      <div className="flex items-center text-emerald-600 text-sm font-semibold cursor-pointer hover:text-emerald-700 transition-colors">
+                      <div
+                        className="flex items-center text-emerald-600 text-sm font-semibold cursor-pointer hover:text-emerald-700 transition-colors"
+                        onClick={feature.onClick}
+                      >
                         <span>Learn more</span>
                         <ArrowRight className="ml-2 w-4 h-4" />
                       </div>
@@ -206,7 +213,12 @@ export default function Dashboard() {
           ) : (
             <Outlet />
           )}
+          {/* Footer text */}
+          <p className="text-center text-gray-500 text-xs mt-6">
+            © {new Date().getFullYear()} AgriPredict. Empowering farmers with AI-driven insights.
+          </p>
         </main>
+
       </div>
     </div>
   );

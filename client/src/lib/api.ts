@@ -116,7 +116,34 @@ export const getLiveHistory = async (filters?: {
   return res.data; };
 
 // Chatbot endpoint
-export const sendChatMessage = async (prompt: string) => {
-  const res = await api.post("/chat", { prompt });
+// Chatbot ask query endpoint
+export const askChatbot = async (query: string) => {
+    const res = await api.post("/chatbot/ask", { query });
+    return res.data;  
+};
+//farm guide endpoints
+// Fetch all farming guides
+export const getAllFarmingGuides = async () => {
+  const res = await api.get("farm_guide/");
   return res.data;
 };
+
+// Fetch farming guide by crop name
+export const getFarmingGuideByCrop = async (crop: string) => {
+  const res = await api.get(`/farm_guide/${crop}`);
+  return res.data;
+};
+
+// Insert farming guides (via CSV upload or other means)
+export const insertFarmingGuides = async () => {
+  const res = await api.post("/farm_guide/insert");
+  return res.data;
+};
+
+// Example for inserting new farming guides
+// Call this function if you're going to upload guides to the backend.
+export const insertFarmingGuidesCSV = async () => {
+  const res = await api.post("/farm_guide/insert");
+  return res.data;
+};
+

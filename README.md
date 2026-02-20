@@ -37,7 +37,6 @@ An intelligent crop recommendation system using Machine Learning that provides p
 - **Scikit-learn**: Machine Learning (Random Forest Classifier)
 - **Pandas**: Data processing
 - **Joblib**: Model serialization
-- **Ollama ai**: This is a Ai model that is used in the chatbot to ask questions.
 
 ### Client
 - **React**: Modern UI library
@@ -106,12 +105,6 @@ FLASK_ENV=development
 FLASK_DEBUG=1
 
 OPENWEATHER_API_KEY=your key
-OLLAMA_API_URL=http://localhost:11434
-
-# Check Ollama availability
-OLLAMA_ENABLED = False
-OLLAMA_MODEL = "llama3.2:3b"  # Fast, efficient model for general use
-
 
 
 ### front end .env
@@ -181,7 +174,6 @@ agripredict/
 │   │    
 │   ├── data/
 │   │   └── Crop_recommendation.csv
-│   │   └── Chatbot.csv
 │   ├── model/
 │   │   ├── crop_recommendation_model.pkl  # Trained model
 │   │   ├── label_encoder.pkl  # encode data
@@ -459,7 +451,7 @@ The application uses the following APIs:
 - **Purpose**: Temperature and humidity data
 - **Default key included**: For testing purposes
 - **Get your own**: https://openweathermap.org/api
-- **Location**: Can be changed in `server/app/main.py`
+- **Location**: Can be changed in `server/api/weather.py`
 
 ### NASA POWER API
 - **Purpose**: Rainfall data

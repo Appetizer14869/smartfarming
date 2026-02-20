@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, Leaf, Sparkles } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -10,6 +10,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -42,25 +43,6 @@ export default function Login() {
       </div>
 
       <div className="max-w-md w-full relative z-10">
-        {/* Logo and branding */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl blur-lg opacity-50"></div>
-              <div className="relative bg-gradient-to-br from-emerald-500 to-green-600 p-4 rounded-2xl shadow-lg">
-                <Leaf className="w-10 h-10 text-white" />
-              </div>
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-green-700 bg-clip-text text-transparent mb-2">
-            AgriPredict
-          </h1>
-          <p className="text-gray-600 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-emerald-500" />
-            Smart Farming Solutions
-          </p>
-        </div>
-
         {/* Login card */}
         <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
           <div className="text-center mb-6">
@@ -109,18 +91,34 @@ export default function Login() {
                 Password
               </label>
               <div className="relative">
+                {/* Left Lock Icon */}
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
                 </div>
+
+                {/* Password Input */}
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
+                  className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
                   placeholder="Enter your password"
                   disabled={loading}
                 />
+
+                {/* Right Eye Icon */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-600 transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -146,8 +144,8 @@ export default function Login() {
           <div className="mt-6 text-center">
             <p className="text-gray-600 text-sm">
               Don't have an account?{' '}
-              <Link 
-                to="/register" 
+              <Link
+                to="/register"
                 className="text-emerald-600 font-semibold hover:text-emerald-700 transition-colors inline-flex items-center gap-1"
               >
                 Create account
@@ -161,7 +159,7 @@ export default function Login() {
 
         {/* Footer text */}
         <p className="text-center text-gray-500 text-xs mt-6">
-          © 2026 AgriPredict. Empowering farmers with AI-driven insights.
+          © {new Date().getFullYear()} AgriPredict. Empowering farmers with AI-driven insights.
         </p>
       </div>
     </div>

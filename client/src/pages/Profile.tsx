@@ -8,6 +8,9 @@ interface User {
   id: string;
   email: string;
   username: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function Profile() {
@@ -85,6 +88,15 @@ export default function Profile() {
       </div>
     );
   }
+
+  const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
   return (
     <div className="space-y-6">
@@ -182,7 +194,7 @@ export default function Profile() {
               <Crown className="w-5 h-5 text-yellow-500" />
               <span className="font-semibold text-gray-900">Account Type</span>
             </div>
-            <p className="text-sm text-gray-600">Standard User</p>
+            <p className="text-sm text-gray-600">{user.role === "admin" ? "Administrator" : "Standard User"}</p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm">
             <div className="flex items-center gap-3 mb-2">
@@ -199,7 +211,7 @@ export default function Profile() {
               <CalendarDays className="w-5 h-5 text-blue-500" />
               <span className="font-semibold text-gray-900">Member Since</span>
             </div>
-            <p className="text-sm text-gray-600">January 2025</p>
+            <p className="text-sm text-gray-600">{formatDate(user.createdAt)}</p>
           </div>
         </div>
       </div>
